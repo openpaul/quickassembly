@@ -1,6 +1,9 @@
 #!/usr/bin/env nextflow
 nextflow.enable.dsl=2
 params.name = "unnamed"
+params.reads = false
+params.assembly = false
+params.help = false
 if (params.help) { exit 0, helpMSG() }
 
 println " "
@@ -10,7 +13,30 @@ println "using profile: $workflow.profile"
 println "using output: $params.output"
 println " "
 
-include {itol_levels} from './modules/itol.nf' params(output: params.output, name: params.name)
+include {metaSPAdes} from './modules/spades.nf' params(output: params.output, name: params.name)
+include {CONCOCT} from './modules/binning.nf' params(output: params.output, name: params.name)
+
+reads_ch = Channel
+              .fromFilePairs(params.reads, checkIfExists: true)
+              .map{it -> [params.name, it[1]]}
+
+workflow {
+    if(params.assembly == false){
+        // need to do assembly
+        metaSPAdes(reads_ch)
+        assembly_ch = metaSPAdes.out
+    }else{
+        // construct a channel from input file
+        assembly_ch = Channel.fromPath( params.assembly, checkIfExists: true )
+                .map{it -> [params.name, it[1]]}
+    }
+
+    // binning next
+    CONCOCT(reads_ch.join(assembly_ch))
+    // Last and final step
+
+
+}
 
 
 def helpMSG(){

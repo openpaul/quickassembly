@@ -3,8 +3,8 @@ process metaSPAdes {
         publishDir "${params.output}/${params.name}/assembly/", mode: 'copy', pattern: "*.fasta.gz"
         publishDir "${params.output}/${params.name}/assembly/", mode: 'copy', pattern: "*.graph.gz"
         errorStrategy { task.attempt < 5 ? "retry" : "ignore" }
-        cpus 4
-        memory { 20.GB + (5.GB * task.attempt) }
+        cpus 6
+        memory { 40.GB + (50.GB * task.attempt) }
         clusterOptions { task.memory >= 300.GB ? '-P bigmem': "-q standard" }
         container "docker://quay.io/microbiome-informatics/spades:latest"
     input:

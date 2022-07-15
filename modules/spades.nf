@@ -4,7 +4,7 @@ process metaSPAdes {
         publishDir "${params.output}/${params.name}/assembly/", mode: 'copy', pattern: "*.graph.gz"
         errorStrategy { task.attempt < 5 ? "retry" : "ignore" }
         cpus 6
-        memory { 40.GB + (50.GB * task.attempt) }
+        memory { 300.GB + (50.GB * task.attempt) }
         clusterOptions { task.memory >= 300.GB ? '-P bigmem': "-q standard" }
         container "docker://quay.io/microbiome-informatics/spades:latest"
     input:

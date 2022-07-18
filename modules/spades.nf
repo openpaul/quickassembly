@@ -4,8 +4,8 @@ process metaSPAdes {
         publishDir "${params.output}/${params.name}/assembly/", mode: 'copy', pattern: "*.graph.gz"
         errorStrategy { task.attempt < 5 ? "retry" : "ignore" }
         cpus 6
-        memory { 300.GB + (50.GB * task.attempt) }
-        clusterOptions { task.memory >= 300.GB ? '-P bigmem': "-q standard" }
+        memory { 600.GB + (10.GB * task.attempt) }
+        clusterOptions { task.memory >= 300.GB ? '-q bigmem': "-q standard" }
         container "docker://quay.io/microbiome-informatics/spades:latest"
     input:
         tuple val(name), file(reads)
